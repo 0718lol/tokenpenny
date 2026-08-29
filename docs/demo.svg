@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="368" viewBox="0 0 840 368" font-family="ui-monospace, Menlo, Consolas, 'Liberation Mono', monospace">
+  <rect x="0" y="0" width="840" height="368" rx="12" fill="#1e1e2e"/>
+  <rect x="0" y="0" width="840" height="36" rx="12" fill="#181825"/>
+  <rect x="0" y="24" width="840" height="12" fill="#181825"/>
+  <circle cx="26" cy="18" r="6" fill="#f38ba8"/>
+  <circle cx="46" cy="18" r="6" fill="#f9e2af"/>
+  <circle cx="66" cy="18" r="6" fill="#a6e3a1"/>
+  <text x="420" y="23" text-anchor="middle" font-size="13" fill="#6c7086">tokenpenny</text>
+
+  <g font-size="14" xml:space="preserve">
+    <text x="28" y="70"><tspan fill="#a6e3a1">$ </tspan><tspan fill="#cdd6f4">npx tokenpenny</tspan></text>
+    <text x="28" y="94" fill="#cdd6f4"> </text>
+    <text x="28" y="118" fill="#89b4fa" font-weight="bold">Project         Reqs   Input  Output  Cache R     Cost</text>
+    <text x="28" y="142" fill="#6c7086">--------------  ----  ------  ------  -------  -------</text>
+    <text x="28" y="166" fill="#cdd6f4">api-server     1,204   41.2M   1.1M    88.4M  <tspan fill="#f9e2af">$18.42</tspan></text>
+    <text x="28" y="190" fill="#cdd6f4">ml-notebooks     356   12.7M   240k    25.1M  <tspan fill="#f9e2af">$4.86</tspan></text>
+    <text x="28" y="214" fill="#cdd6f4">blog               98    3.1M    92k     1.2M  <tspan fill="#f9e2af">$0.41</tspan></text>
+    <text x="28" y="238" fill="#a6e3a1" font-weight="bold">TOTAL          1,658   57.0M   1.4M   114.7M  <tspan fill="#f9e2af">$23.69</tspan></text>
+    <text x="28" y="262" fill="#cdd6f4"> </text>
+    <text x="28" y="286" fill="#f9e2af">? 132 requests on unpriced models (kimi-k3) — counted, costed at $0</text>
+    <text x="28" y="310" fill="#cdd6f4"> </text>
+    <text x="28" y="334"><tspan fill="#a6e3a1">$ </tspan><tspan fill="#a6e3a1">▌</tspan></text>
+  </g>
+</svg>

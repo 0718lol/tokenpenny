@@ -1,8 +1,16 @@
 # 💰 tokenpenny
 
+[![CI](https://github.com/0718lol/tokenpenny/actions/workflows/ci.yml/badge.svg)](https://github.com/0718lol/tokenpenny/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/tokenpenny)](https://www.npmjs.com/package/tokenpenny)
+[![license](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
+
 **See where your AI coding agents' tokens and dollars actually go — one command, every agent, task-level attribution.**
 
 **看清你的 AI 编程 Agent 把 token 和钱花在了哪里 —— 一条命令，全家桶，任务级归因。**
+
+<p align="center">
+  <img src="docs/demo.svg" alt="tokenpenny demo" width="720">
+</p>
 
 > ccusage knows how much you spent on Claude Code. tokenpenny knows where it went — across every agent you use — and how to spend less.
 >
@@ -11,8 +19,6 @@
 One command, zero config, 100% local: tokenpenny reads the session logs your coding agents already write to disk. No daemon, no API keys, nothing leaves your machine.
 
 一条命令、零配置、纯本地：tokenpenny 直接解析编程 Agent 已经写在磁盘上的会话日志。没有后台进程，不需要 API key，数据不出你的电脑。
-
-<!-- TODO before launch: replace `your-username` with the GitHub owner in badges below -->
 
 ## Quick start
 
@@ -27,15 +33,13 @@ Requires Node.js >= 20. Requires nothing else.
 
 ## Sample output
 
-Real output from a real machine (model names anonymized except the honest part):
-
 ```text
-Project           Reqs   Input  Output  Cache R  Cache W   Cost
-----------------  ----  ------  ------  -------  -------  -----
-knowledge-engine    66    7.4M    8.4k   851.5k        0  $0.00
-wanganchang         61    2.6M   11.9k   121.6k        0  $0.00
-new idea             5  568.7k    1.1k        0        0  $0.00
-TOTAL              132   10.5M   21.4k   973.1k        0  $0.00
+Project         Reqs   Input  Output  Cache R     Cost
+--------------  ----  ------  ------  -------  -------
+api-server     1,204   41.2M   1.1M    88.4M  $18.42
+ml-notebooks     356   12.7M   240k    25.1M   $4.86
+blog               98    3.1M    92k     1.2M   $0.41
+TOTAL          1,658   57.0M   1.4M   114.7M  $23.69
 
 ? 132 requests on unpriced models (kimi-k3) — counted, costed at $0
 ```
