@@ -1,0 +1,42 @@
+{
+  "name": "tokenpenny",
+  "version": "0.1.0",
+  "description": "See where your AI coding agents' tokens and dollars actually go — one command, every agent, task-level attribution. 看清你的 AI 编程 Agent 把 token 和钱花在了哪里。",
+  "type": "module",
+  "bin": {
+    "tokenpenny": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "test": "tsc --noEmit && node --import tsx --test test/*.test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "claude-code",
+    "codex",
+    "llm",
+    "tokens",
+    "cost",
+    "usage",
+    "ai-agents",
+    "cli",
+    "dashboard"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0"
+  }
+}
