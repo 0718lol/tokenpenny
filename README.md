@@ -26,6 +26,7 @@ One command, zero config, 100% local: tokenpenny reads the session logs your cod
 npx tokenpenny                              # last 30 days, grouped by project
 npx tokenpenny report --since 7d --by model # this week, per model
 npx tokenpenny report --by branch           # which branch burned the money
+npx tokenpenny report --by pr               # roll it up per pull request
 npx tokenpenny report --by branch -p api-server  # drill into one project
 npx tokenpenny report --since all --by day  # everything, per day
 npx tokenpenny sources                      # which agents were detected
@@ -61,7 +62,7 @@ Note the last line: models tokenpenny has no verified price for are **flagged, n
 ## Roadmap — three pillars
 
 1. **Every agent, one ledger.** One command sums up every coding agent on your machine. 一个命令算清全家所有 Agent 的账。
-2. **Task-level attribution.** ✅ Branch-level attribution shipped in v0.2: `--by branch` answers *"which branch burned the money"*, and `-p <project>` drills into one repo. PR-level rollups are next. Branch data comes straight from the agent transcripts (Claude Code carries `gitBranch`). 钱花在哪个分支上，一目了然。
+2. **Task-level attribution.** ✅ Fully shipped: `--by branch` (v0.2) answers *"which branch burned the money"*, and `--by pr` (v0.3) rolls costs up per pull request — PR numbers and titles are mapped from your local git merge commits, still 100% offline, no GitHub API. `-p <project>` drills into one repo. 钱花在哪个分支、哪个 PR 上，一目了然。
 3. **Spend less.** Budget alerts and actionable suggestions: which calls could run on a cheaper model. 预算告警 + 可执行的省钱建议。
 
 ## Design principles
@@ -69,6 +70,8 @@ Note the last line: models tokenpenny has no verified price for are **flagged, n
 - **Local-only.** Parse files on disk; never call home. 纯本地，绝不上传。
 - **Zero config.** Autodetect every agent's data directory. 自动发现一切。
 - **Honest numbers.** Unpriced models are labeled, not estimated. 不确定的价格不猜。
+
+Known limitation: `--by pr` maps branches to PRs from GitHub-style merge commits in your local git history. Squash-merged PRs don't record the branch name, so those can't be tied back offline — those branches show up as `(no PR) <branch>`.（已知限制：squash 合并的 PR 不含分支名，无法离线关联，对应分支会显示为 `(no PR) <branch>`。）
 
 ## Add an agent (great first issue)
 
@@ -106,7 +109,7 @@ npm run dev -- report --since 7d --by model
 
 - **为什么**：编程 Agent 的会话日志本来就写在本地磁盘上，却没有一个工具能跨 Agent 把这些账算清楚——ccusage 只管 Claude Code，各家实时监控也各管各的。
 - **怎么用**：`npx tokenpenny` 一条命令，按项目/天/模型/会话聚合 token 和成本。
-- **三大支柱**：① 全家桶适配（Claude Code / Codex / DSH / OpenCode / Gemini CLI）；② 任务级归因（v0.2 已支持 `--by branch` 按分支算账，`-p` 下钻单项目，PR 级归因在路上）；③ 省钱闭环（预算告警 + 换便宜模型的建议）。
+- **三大支柱**：① 全家桶适配（Claude Code / Codex / DSH / OpenCode / Gemini CLI）；② 任务级归因（✅ v0.2 按分支 `--by branch`，✅ v0.3 按 PR `--by pr`，PR 号从本地 git 合并提交中离线解析，`-p` 下钻单项目）；③ 省钱闭环（预算告警 + 换便宜模型的建议）。
 - **隐私**：纯本地解析，不需要 API key，没有任何网络请求。
 
 欢迎通过 PR 接入新 Agent——实现 `AgentSource` 接口即可，见上文示例。

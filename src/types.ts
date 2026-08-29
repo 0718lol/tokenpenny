@@ -14,6 +14,9 @@ export interface UsageEvent {
   outputTokens: number;
   cacheReadTokens: number;
   cacheWriteTokens: number;
+  /** Filled by PR attribution (enrichWithPRs) — absent unless --by pr */
+  prNumber?: number | null;
+  prTitle?: string | null;
 }
 
 export interface Totals {
@@ -27,7 +30,7 @@ export interface Totals {
   unknownModelRequests: number;
 }
 
-export type GroupBy = 'project' | 'day' | 'model' | 'session' | 'source' | 'branch';
+export type GroupBy = 'project' | 'day' | 'model' | 'session' | 'source' | 'branch' | 'pr';
 
 export interface GroupRow extends Totals {
   key: string;

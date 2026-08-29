@@ -1,9 +1,10 @@
 import type { GroupBy } from '../types.js';
 import { aggregate, filterProject, parseSince } from '../core/aggregate.js';
+import { enrichWithPRs } from '../core/prs.js';
 import { renderReport } from '../core/format.js';
 import { loadEvents } from '../sources/index.js';
 
-const GROUP_BY: GroupBy[] = ['project', 'day', 'model', 'session', 'source', 'branch'];
+const GROUP_BY: GroupBy[] = ['project', 'day', 'model', 'session', 'source', 'branch', 'pr'];
 
 export interface ReportOptions {
   since?: string;
@@ -25,11 +26,13 @@ export async function report(options: ReportOptions): Promise<void> {
     console.log('No usage events found. Detected no readable agent session logs.');
     return;
   }
-  const events = options.project ? filterProject(all, options.project) : all;
-  if (events.length === 0) {
+  const base = options.project ? filterProject(all, options.project) : all;
+  if (base.length === 0) {
     console.log(`No usage events found for project "${options.project}".`);
     return;
   }
+  // PR attribution needs a git-log scan per project — only pay for it on --by pr.
+  const events = by === 'pr' ? enrichWithPRs(base) : base;
 
   const agg = aggregate(events, by, since);
   if (options.top) {

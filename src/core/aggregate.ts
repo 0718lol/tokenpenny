@@ -23,6 +23,13 @@ export function groupKey(e: UsageEvent, groupBy: GroupBy): string {
       return e.sessionId ? e.sessionId.slice(0, 8) : 'unknown';
     case 'branch':
       return e.gitBranch ?? 'unknown';
+    case 'pr': {
+      if (e.prNumber) {
+        return e.prTitle ? `#${e.prNumber} ${e.prTitle.slice(0, 40)}` : `#${e.prNumber}`;
+      }
+      if (e.gitBranch) return `(no PR) ${e.gitBranch}`;
+      return 'unknown';
+    }
     case 'project': {
       if (!e.projectPath) return 'unknown';
       return projectBasename(e.projectPath);
