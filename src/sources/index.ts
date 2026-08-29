@@ -2,6 +2,9 @@ import { promises as fs } from 'node:fs';
 import type { SourceInfo, UsageEvent } from '../types.js';
 import * as claudeCode from './claude-code.js';
 import * as codex from './codex.js';
+import * as dsh from './dsh.js';
+import * as opencode from './opencode.js';
+import * as geminiCli from './gemini-cli.js';
 
 async function pathExists(p: string): Promise<boolean> {
   try {
@@ -38,6 +41,27 @@ export const SOURCES: AgentSource[] = [
     dataDir: codex.defaultDataDir,
     isDetected: () => codex.isDetected(),
     collectEvents: () => codex.collectEvents(),
+  },
+  {
+    id: 'dsh',
+    name: 'DeepSeek Harness',
+    dataDir: dsh.defaultDataDir,
+    isDetected: () => dsh.isDetected(),
+    collectEvents: () => dsh.collectEvents(),
+  },
+  {
+    id: 'opencode',
+    name: 'OpenCode',
+    dataDir: opencode.defaultDataDir,
+    isDetected: () => opencode.isDetected(),
+    collectEvents: () => opencode.collectEvents(),
+  },
+  {
+    id: 'gemini-cli',
+    name: 'Gemini CLI',
+    dataDir: geminiCli.defaultDataDir,
+    isDetected: () => geminiCli.isDetected(),
+    collectEvents: () => geminiCli.collectEvents(),
   },
 ];
 

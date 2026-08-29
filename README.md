@@ -55,9 +55,9 @@ Note the last line: models tokenpenny has no verified price for are **flagged, n
 |---|---|
 | Claude Code | ✅ shipped |
 | Codex (OpenAI) | ✅ shipped |
-| DeepSeek Harness (DSH) | planned — PRs welcome |
-| OpenCode | planned — PRs welcome |
-| Gemini CLI | planned — PRs welcome |
+| DeepSeek Harness (DSH) | 🔜 detection shipped — parser needs the official 4-layer zstd codec, see `src/sources/dsh.ts` |
+| OpenCode | 🔜 detection shipped — parser needs its SQLite schema, see `src/sources/opencode.ts` |
+| Gemini CLI | 🔜 detection shipped — parser needs a verified session format, see `src/sources/gemini-cli.ts` |
 
 ## Roadmap — three pillars
 
