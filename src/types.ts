@@ -27,7 +27,7 @@ export interface Totals {
   unknownModelRequests: number;
 }
 
-export type GroupBy = 'project' | 'day' | 'model' | 'session' | 'source';
+export type GroupBy = 'project' | 'day' | 'model' | 'session' | 'source' | 'branch';
 
 export interface GroupRow extends Totals {
   key: string;

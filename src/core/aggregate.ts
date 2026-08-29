@@ -21,12 +21,26 @@ export function groupKey(e: UsageEvent, groupBy: GroupBy): string {
       return e.source;
     case 'session':
       return e.sessionId ? e.sessionId.slice(0, 8) : 'unknown';
+    case 'branch':
+      return e.gitBranch ?? 'unknown';
     case 'project': {
       if (!e.projectPath) return 'unknown';
-      const parts = e.projectPath.split('/').filter(Boolean);
-      return parts[parts.length - 1] ?? e.projectPath;
+      return projectBasename(e.projectPath);
     }
   }
+}
+
+export function projectBasename(projectPath: string): string {
+  const parts = projectPath.split('/').filter(Boolean);
+  return parts[parts.length - 1] ?? projectPath;
+}
+
+/** Keep only events from one project, matched by folder name or full path. */
+export function filterProject(events: UsageEvent[], project: string): UsageEvent[] {
+  return events.filter((e) => {
+    if (!e.projectPath) return false;
+    return projectBasename(e.projectPath) === project || e.projectPath === project;
+  });
 }
 
 /**

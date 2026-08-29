@@ -36,6 +36,7 @@ const HEADERS: Record<GroupBy, string[]> = {
   model: ['Model', 'Reqs', 'Input', 'Output', 'Cache R', 'Cache W', 'Cost'],
   source: ['Source', 'Reqs', 'Input', 'Output', 'Cache R', 'Cache W', 'Cost'],
   session: ['Session', 'Reqs', 'Input', 'Output', 'Cache R', 'Cache W', 'Cost'],
+  branch: ['Branch', 'Reqs', 'Input', 'Output', 'Cache R', 'Cache W', 'Cost'],
 };
 
 export function renderReport(agg: Aggregates): string {

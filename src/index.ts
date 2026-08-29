@@ -20,7 +20,8 @@ program
   .command('report', { isDefault: true })
   .description('Aggregate token usage and cost across all detected agents (default)')
   .option('-s, --since <period>', 'time window: 7d, 30d, 90d, YYYY-MM-DD, or all', '30d')
-  .option('-b, --by <dimension>', 'group by: project, day, model, session, source', 'project')
+  .option('-b, --by <dimension>', 'group by: project, day, model, session, source, branch', 'project')
+  .option('-p, --project <name>', 'filter to one project (folder name or full path)')
   .option('-t, --top <n>', 'show only the top n rows')
   .option('--json', 'output JSON instead of a table')
   .action((opts) => report(opts));

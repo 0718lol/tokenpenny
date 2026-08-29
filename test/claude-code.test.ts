@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { collectEvents } from '../src/sources/claude-code.js';
-import { aggregate } from '../src/core/aggregate.js';
+import { aggregate, filterProject } from '../src/core/aggregate.js';
 import { eventCost, priceFor } from '../src/core/pricing.js';
 import { renderReport } from '../src/core/format.js';
 import type { UsageEvent } from '../src/types.js';
@@ -87,4 +87,29 @@ test('renderReport produces a readable table', async () => {
   assert.match(out, /TOTAL/);
   assert.match(out, /\$0\.01/);
   assert.match(out, /unpriced models \(kimi-k3\)/);
+});
+
+test('aggregates by git branch — task-level attribution', async () => {
+  const events = dedupe(await collectEvents(FIXTURE_DIR));
+  const byBranch = aggregate(events, 'branch', null);
+
+  // msg_2 (gpt-5-codex, feat/dashboard): 0.0125 — most expensive branch first
+  assert.equal(byBranch.groups[0].key, 'feat/dashboard');
+  assert.ok(Math.abs(byBranch.groups[0].costUSD - 0.0125) < 1e-9);
+
+  // msg_1 (sonnet, main) + msg_3 (kimi, main, unpriced): 2 requests, 0.001134
+  assert.equal(byBranch.groups[1].key, 'main');
+  assert.equal(byBranch.groups[1].requests, 2);
+  assert.ok(Math.abs(byBranch.groups[1].costUSD - 0.001134) < 1e-9);
+});
+
+test('filters to a single project by name or path', async () => {
+  const events = dedupe(await collectEvents(FIXTURE_DIR));
+
+  const alpha = filterProject(events, 'proj-alpha');
+  assert.equal(alpha.length, 2);
+  assert.ok(Math.abs(aggregate(alpha, 'project', null).totals.costUSD - 0.013634) < 1e-9);
+
+  assert.equal(filterProject(events, '/Users/dev/proj-beta').length, 1);
+  assert.equal(filterProject(events, 'does-not-exist').length, 0);
 });

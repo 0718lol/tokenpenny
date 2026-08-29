@@ -1,15 +1,16 @@
 import type { GroupBy } from '../types.js';
-import { aggregate, parseSince } from '../core/aggregate.js';
+import { aggregate, filterProject, parseSince } from '../core/aggregate.js';
 import { renderReport } from '../core/format.js';
 import { loadEvents } from '../sources/index.js';
 
-const GROUP_BY: GroupBy[] = ['project', 'day', 'model', 'session', 'source'];
+const GROUP_BY: GroupBy[] = ['project', 'day', 'model', 'session', 'source', 'branch'];
 
 export interface ReportOptions {
   since?: string;
   by?: string;
   top?: string;
   json?: boolean;
+  project?: string;
 }
 
 export async function report(options: ReportOptions): Promise<void> {
@@ -19,9 +20,14 @@ export async function report(options: ReportOptions): Promise<void> {
     throw new Error(`Invalid --by value: "${by}" (choose from ${GROUP_BY.join(', ')})`);
   }
 
-  const events = await loadEvents();
-  if (events.length === 0) {
+  const all = await loadEvents();
+  if (all.length === 0) {
     console.log('No usage events found. Detected no readable agent session logs.');
+    return;
+  }
+  const events = options.project ? filterProject(all, options.project) : all;
+  if (events.length === 0) {
+    console.log(`No usage events found for project "${options.project}".`);
     return;
   }
 

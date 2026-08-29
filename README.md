@@ -25,6 +25,8 @@ One command, zero config, 100% local: tokenpenny reads the session logs your cod
 ```bash
 npx tokenpenny                              # last 30 days, grouped by project
 npx tokenpenny report --since 7d --by model # this week, per model
+npx tokenpenny report --by branch           # which branch burned the money
+npx tokenpenny report --by branch -p api-server  # drill into one project
 npx tokenpenny report --since all --by day  # everything, per day
 npx tokenpenny sources                      # which agents were detected
 ```
@@ -59,7 +61,7 @@ Note the last line: models tokenpenny has no verified price for are **flagged, n
 ## Roadmap — three pillars
 
 1. **Every agent, one ledger.** One command sums up every coding agent on your machine. 一个命令算清全家所有 Agent 的账。
-2. **Task-level attribution.** Costs mapped to git branches and PRs — *"this feature cost $4.50, and 60% of it was re-reading the same three files."* Claude Code transcripts already carry `gitBranch`; we're using it. 钱花在哪个分支、哪个任务上，一目了然。
+2. **Task-level attribution.** ✅ Branch-level attribution shipped in v0.2: `--by branch` answers *"which branch burned the money"*, and `-p <project>` drills into one repo. PR-level rollups are next. Branch data comes straight from the agent transcripts (Claude Code carries `gitBranch`). 钱花在哪个分支上，一目了然。
 3. **Spend less.** Budget alerts and actionable suggestions: which calls could run on a cheaper model. 预算告警 + 可执行的省钱建议。
 
 ## Design principles
@@ -104,7 +106,7 @@ npm run dev -- report --since 7d --by model
 
 - **为什么**：编程 Agent 的会话日志本来就写在本地磁盘上，却没有一个工具能跨 Agent 把这些账算清楚——ccusage 只管 Claude Code，各家实时监控也各管各的。
 - **怎么用**：`npx tokenpenny` 一条命令，按项目/天/模型/会话聚合 token 和成本。
-- **三大支柱**：① 全家桶适配（Claude Code / Codex / DSH / OpenCode / Gemini CLI）；② 任务级归因（成本挂到 git 分支和 PR）；③ 省钱闭环（预算告警 + 换便宜模型的建议）。
+- **三大支柱**：① 全家桶适配（Claude Code / Codex / DSH / OpenCode / Gemini CLI）；② 任务级归因（v0.2 已支持 `--by branch` 按分支算账，`-p` 下钻单项目，PR 级归因在路上）；③ 省钱闭环（预算告警 + 换便宜模型的建议）。
 - **隐私**：纯本地解析，不需要 API key，没有任何网络请求。
 
 欢迎通过 PR 接入新 Agent——实现 `AgentSource` 接口即可，见上文示例。
