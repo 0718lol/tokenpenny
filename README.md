@@ -47,7 +47,7 @@ Note the last line: models tokenpenny has no verified price for are **flagged, n
 | Agent | Status |
 |---|---|
 | Claude Code | ✅ shipped |
-| Codex (OpenAI) | 🔜 in progress |
+| Codex (OpenAI) | ✅ shipped |
 | DeepSeek Harness (DSH) | planned — PRs welcome |
 | OpenCode | planned — PRs welcome |
 | Gemini CLI | planned — PRs welcome |

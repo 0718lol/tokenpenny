@@ -1,6 +1,16 @@
+import { promises as fs } from 'node:fs';
 import type { SourceInfo, UsageEvent } from '../types.js';
 import * as claudeCode from './claude-code.js';
 import * as codex from './codex.js';
+
+async function pathExists(p: string): Promise<boolean> {
+  try {
+    await fs.access(p);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Every agent tokenpenny can read is registered here. Adding a new agent =
@@ -19,14 +29,7 @@ export const SOURCES: AgentSource[] = [
     id: 'claude-code',
     name: 'Claude Code',
     dataDir: claudeCode.defaultDataDir,
-    isDetected: async () => {
-      try {
-        await (await import('node:fs/promises')).access(claudeCode.defaultDataDir());
-        return true;
-      } catch {
-        return false;
-      }
-    },
+    isDetected: () => pathExists(claudeCode.defaultDataDir()),
     collectEvents: () => claudeCode.collectEvents(),
   },
   {
