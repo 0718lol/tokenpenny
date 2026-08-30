@@ -73,6 +73,12 @@ Note the last line: models tokenpenny has no verified price for are **flagged, n
 
 Known limitation: `--by pr` maps branches to PRs from GitHub-style merge commits in your local git history. Squash-merged PRs don't record the branch name, so those can't be tied back offline — those branches show up as `(no PR) <branch>`.（已知限制：squash 合并的 PR 不含分支名，无法离线关联，对应分支会显示为 `(no PR) <branch>`。）
 
+## Pricing
+
+Pricing comes from a **vendored [LiteLLM](https://github.com/BerriAI/litellm) snapshot** (`data/model-prices.json`, ~2.8k priced models), committed to the repo so every report works fully offline. A monthly CI job refreshes the snapshot and opens a PR when prices moved; a small hand-curated table keeps priority for models we verified ourselves. Models with no price entry anywhere are **flagged, never guessed**.
+
+价格数据来自内置的 LiteLLM 定价快照（约 2800 个模型条目），随仓库分发、完全离线可用；CI 每月自动刷新并开 PR 更新。任何地方都查不到价格的模型会被明确标注，绝不瞎猜。
+
 ## Add an agent (great first issue)
 
 Implement one interface and register it — that's the whole adapter:

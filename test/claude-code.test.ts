@@ -5,8 +5,13 @@ import { fileURLToPath } from 'node:url';
 import { collectEvents } from '../src/sources/claude-code.js';
 import { aggregate, filterProject } from '../src/core/aggregate.js';
 import { eventCost, priceFor } from '../src/core/pricing.js';
+import { setPriceSnapshot } from '../src/core/pricing.js';
 import { renderReport } from '../src/core/format.js';
 import type { UsageEvent } from '../src/types.js';
+
+// Isolate from the vendored snapshot: fixture expectations must not move when
+// LiteLLM prices change. Each test file runs in its own process under --test.
+setPriceSnapshot({ 'gpt-5-codex': { input: 1.25, output: 10 } });
 
 const FIXTURE_DIR = path.join(
   path.dirname(fileURLToPath(import.meta.url)),

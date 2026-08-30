@@ -1,6 +1,6 @@
 {
   "name": "tokenpenny",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "See where your AI coding agents' tokens and dollars actually go — one command, every agent, task-level attribution. 看清你的 AI 编程 Agent 把 token 和钱花在了哪里。",
   "type": "module",
   "bin": {
@@ -8,6 +8,7 @@
   },
   "files": [
     "dist",
+    "data",
     "README.md"
   ],
   "engines": {
@@ -17,6 +18,7 @@
     "build": "tsc",
     "dev": "tsx src/index.ts",
     "test": "tsc --noEmit && node --import tsx --test test/*.test.ts",
+    "update-prices": "node scripts/update-prices.mjs",
     "prepublishOnly": "npm run build"
   },
   "keywords": [

@@ -4,6 +4,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { collectEvents } from '../src/sources/codex.js';
 import { aggregate } from '../src/core/aggregate.js';
+import { setPriceSnapshot } from '../src/core/pricing.js';
+
+// Isolate from the vendored snapshot so cost expectations stay stable across
+// monthly LiteLLM refreshes (each test file runs in its own process).
+setPriceSnapshot({ 'gpt-5.6-sol': { input: 1.25, output: 10, cacheRead: 0.125 } });
 
 const FIXTURE_DIR = path.join(
   path.dirname(fileURLToPath(import.meta.url)),

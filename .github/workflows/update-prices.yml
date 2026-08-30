@@ -1,0 +1,30 @@
+name: Update pricing snapshot
+
+on:
+  schedule:
+    - cron: '0 6 1 * *' # monthly, 1st at 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/update-prices.mjs
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: 'chore: refresh LiteLLM pricing snapshot'
+          title: 'chore: monthly pricing snapshot refresh'
+          body: |
+            Automated monthly refresh of `data/model-prices.json` from
+            [LiteLLM's pricing database](https://github.com/BerriAI/litellm).
+            If CI is green, merging keeps model pricing current for everyone.
+          branch: chore/pricing-refresh
+          delete-branch: true
