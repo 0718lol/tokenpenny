@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs';
 import { Command } from 'commander';
 import { report } from './commands/report.js';
 import { blocks } from './commands/blocks.js';
+import { watch } from './commands/watch.js';
+import { statusline } from './commands/statusline.js';
 import { detectSources } from './sources/index.js';
 import { fmtInt, table } from './core/format.js';
 
@@ -34,6 +36,19 @@ program
   .option('-t, --top <n>', 'show only the n most recent blocks')
   .option('--json', 'output JSON instead of a table')
   .action((opts) => blocks(opts));
+
+program
+  .command('watch')
+  .description('Live dashboard: active block, burn rate, today/week/all-time totals')
+  .option('-i, --interval <seconds>', 'refresh interval in seconds (min 2)', '5')
+  .action((opts) => watch(opts));
+
+program
+  .command('statusline')
+  .description(
+    'One-line summary for Claude Code statusLine — add "statusLine": {"type":"command","command":"npx tokenpenny statusline"} to ~/.claude/settings.json',
+  )
+  .action(() => statusline());
 
 program
   .command('sources')

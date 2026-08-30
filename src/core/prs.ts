@@ -22,19 +22,35 @@ export interface PRRef {
   title: string | null;
 }
 
+/**
+ * Agent sessions record the directory they ran in, which is often a
+ * subdirectory of the actual repo — walk up a few levels to find .git.
+ */
+function findGitRoot(start: string): string | null {
+  let dir = start;
+  for (let depth = 0; depth < 8; depth++) {
+    try {
+      accessSync(path.join(dir, '.git'));
+      return dir;
+    } catch {
+      const parent = path.dirname(dir);
+      if (parent === dir) return null;
+      dir = parent;
+    }
+  }
+  return null;
+}
+
 export function scanProjectPRs(projectPath: string): Map<string, PRRef> {
   const map = new Map<string, PRRef>();
-  try {
-    accessSync(path.join(projectPath, '.git'));
-  } catch {
-    return map;
-  }
+  const root = findGitRoot(projectPath);
+  if (!root) return map;
 
   let out: Buffer;
   try {
     out = execFileSync(
       'git',
-      ['-C', projectPath, 'log', '--all', '--max-count=20000', '--format=%s%x1f%b%x1e'],
+      ['-C', root, 'log', '--all', '--max-count=20000', '--format=%s%x1f%b%x1e'],
       { timeout: 15000, maxBuffer: 64 * 1024 * 1024 },
     );
   } catch {

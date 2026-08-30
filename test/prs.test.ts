@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execSync } from 'node:child_process';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, mkdirSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { enrichWithPRs, scanProjectPRs } from '../src/core/prs.js';
@@ -39,6 +39,11 @@ test('scanProjectPRs maps branches to PR numbers and titles', { skip: !hasGit },
     assert.ok(ref, 'feat/cool should map to a PR');
     assert.equal(ref!.number, 42);
     assert.equal(ref!.title, 'Add the cool thing');
+    // Regression: sessions often run in a subdirectory of the repo — the
+    // scanner must walk up to find .git
+    const sub = path.join(dir, 'packages', 'app');
+    mkdirSync(sub, { recursive: true });
+    assert.ok(scanProjectPRs(sub).get('feat/cool'), 'subdirectory cwd should still find the repo');
     // Nonexistent repos and plain folders degrade to an empty map
     assert.equal(scanProjectPRs(path.join(os.tmpdir())).size, 0);
   } finally {

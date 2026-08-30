@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -78,7 +79,12 @@ function buildSuffixIndex(): Map<string, SnapshotEntry> {
     if (lastSlash !== -1) candidates.push(key.slice(lastSlash + 1));
     const base = candidates[candidates.length - 1];
     const firstDot = base.indexOf('.');
-    if (firstDot !== -1) candidates.push(base.slice(firstDot + 1)); // strip "vendor." namespace
+    if (firstDot !== -1) {
+      const namespace = base.slice(0, firstDot);
+      // Strip vendor namespaces ("moonshotai.kimi-k2.5" -> "kimi-k2.5") but
+      // never version fragments ("gpt-5.6-sol" must not index "5.6-sol")
+      if (!/\d/.test(namespace)) candidates.push(base.slice(firstDot + 1));
+    }
     for (const c of candidates) {
       if (!suffixes.has(c)) suffixes.set(c, entry);
     }
@@ -124,9 +130,49 @@ function toModelPrice(e: SnapshotEntry): ModelPrice | null {
 
 export function priceFor(model: string | null): ModelPrice | null {
   if (!model) return null;
+  const override = loadOverrides().get(model);
+  if (override) return override;
   const entry = PRICES.find((p) => p.match.test(model));
   if (entry) return entry.price;
   return fromSnapshot(model);
+}
+
+/**
+ * User-supplied price overrides, highest priority of all layers. Loaded from
+ * ./.tokenpenny.json or ~/.tokenpenny.json (first one found wins):
+ *   { "prices": { "my-proxy-model": { "input": 3, "output": 15 } } }
+ * USD per 1M tokens. Lets users price proxies/internal aliases correctly.
+ */
+let overrides: Map<string, ModelPrice> | undefined;
+
+function loadOverrides(): Map<string, ModelPrice> {
+  if (overrides !== undefined) return overrides;
+  overrides = new Map();
+  for (const file of [path.join(process.cwd(), '.tokenpenny.json'), path.join(os.homedir(), '.tokenpenny.json')]) {
+    try {
+      const parsed = JSON.parse(readFileSync(file, 'utf8')) as {
+        prices?: Record<string, ModelPrice>;
+      };
+      for (const [model, price] of Object.entries(parsed.prices ?? {})) {
+        if (!price || (price.input == null && price.output == null)) continue;
+        overrides.set(model, {
+          input: price.input ?? 0,
+          output: price.output ?? 0,
+          ...(price.cacheRead != null && { cacheRead: price.cacheRead }),
+          ...(price.cacheWrite != null && { cacheWrite: price.cacheWrite }),
+        });
+      }
+      break; // first existing config wins
+    } catch {
+      // missing or invalid — try the next location
+    }
+  }
+  return overrides;
+}
+
+/** Test hook: replace overrides without touching the filesystem. */
+export function setPriceOverrides(map: Record<string, ModelPrice> | null): void {
+  overrides = map ? new Map(Object.entries(map)) : new Map();
 }
 
 /** Cost of one event in USD, or null when the model has no price entry. */

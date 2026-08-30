@@ -24,16 +24,31 @@ One command, zero config, 100% local: tokenpenny reads the session logs your cod
 
 ```bash
 npx tokenpenny                              # last 30 days, grouped by project
-npx tokenpenny report --since 7d --by model # this week, per model
+npx tokenpenny watch                        # live dashboard: active block, burn rate
+npx tokenpenny blocks                       # 5-hour billing windows, active-block detection
 npx tokenpenny report --by branch           # which branch burned the money
 npx tokenpenny report --by pr               # roll it up per pull request
 npx tokenpenny report --by week             # weekly rollups (month works too)
-npx tokenpenny blocks                       # 5-hour billing windows, active-block detection
 npx tokenpenny report --by branch -p api-server  # drill into one project
+npx tokenpenny statusline                   # one-liner for Claude Code's status line
 npx tokenpenny sources                      # which agents were detected
 ```
 
 Requires Node.js >= 20. Requires nothing else.
+
+**Claude Code status line** — add to `~/.claude/settings.json`:
+
+```json
+{ "statusLine": { "type": "command", "command": "npx tokenpenny statusline" } }
+```
+
+**Price overrides** — proxies and internal model aliases aren't in any public
+pricing database. Price them yourself in `./.tokenpenny.json` or
+`~/.tokenpenny.json` (USD per 1M tokens, highest priority of all pricing layers):
+
+```json
+{ "prices": { "my-proxy-model": { "input": 3, "output": 15 } } }
+```
 
 ## Sample output
 
@@ -116,7 +131,7 @@ npm run dev -- report --since 7d --by model
 
 - **为什么**：编程 Agent 的会话日志本来就写在本地磁盘上，却没有一个工具能跨 Agent 把这些账算清楚——ccusage 只管 Claude Code，各家实时监控也各管各的。
 - **怎么用**：`npx tokenpenny` 一条命令，按项目/天/模型/会话聚合 token 和成本。
-- **三大支柱**：① 全家桶适配（Claude Code / Codex / DSH / OpenCode / Gemini CLI）；② 任务级归因（✅ v0.2 按分支 `--by branch`，✅ v0.3 按 PR `--by pr`，PR 号从本地 git 合并提交中离线解析，`-p` 下钻单项目）；③ 省钱闭环（预算告警 + 换便宜模型的建议）。
+- **三大支柱**：① 全家桶适配（Claude Code / Codex / DSH / OpenCode / Gemini CLI）；② 任务级归因（✅ v0.2 按分支 `--by branch`，✅ v0.3 按 PR `--by pr`，PR 号从本地 git 合并提交中离线解析，`-p` 下钻单项目）；③ 省钱闭环（✅ v0.5 精确定价 + 自定义价格覆盖，✅ v0.6 blocks 计费窗口，✅ v0.7 `watch` 实时面板与 `statusline` 状态栏）。
 - **隐私**：纯本地解析，不需要 API key，没有任何网络请求。
 
 欢迎通过 PR 接入新 Agent——实现 `AgentSource` 接口即可，见上文示例。
