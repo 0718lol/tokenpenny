@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { Command } from 'commander';
 import { report } from './commands/report.js';
+import { blocks } from './commands/blocks.js';
 import { detectSources } from './sources/index.js';
 import { fmtInt, table } from './core/format.js';
 
@@ -20,11 +21,19 @@ program
   .command('report', { isDefault: true })
   .description('Aggregate token usage and cost across all detected agents (default)')
   .option('-s, --since <period>', 'time window: 7d, 30d, 90d, YYYY-MM-DD, or all', '30d')
-  .option('-b, --by <dimension>', 'group by: project, day, model, session, source, branch, pr', 'project')
+  .option('-b, --by <dimension>', 'group by: project, day, week, month, model, session, source, branch, pr', 'project')
   .option('-p, --project <name>', 'filter to one project (folder name or full path)')
   .option('-t, --top <n>', 'show only the top n rows')
   .option('--json', 'output JSON instead of a table')
   .action((opts) => report(opts));
+
+program
+  .command('blocks')
+  .description('5-hour billing windows with active-block detection')
+  .option('-s, --since <period>', 'time window: 7d, 30d, 90d, YYYY-MM-DD, or all', '30d')
+  .option('-t, --top <n>', 'show only the n most recent blocks')
+  .option('--json', 'output JSON instead of a table')
+  .action((opts) => blocks(opts));
 
 program
   .command('sources')

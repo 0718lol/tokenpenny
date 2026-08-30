@@ -14,7 +14,15 @@ const EMPTY_TOTALS = (): Totals => ({
 export function groupKey(e: UsageEvent, groupBy: GroupBy): string {
   switch (groupBy) {
     case 'day':
-      return e.timestamp.slice(0, 10);
+      return e.timestamp.slice(0, 10) || 'unknown';
+    case 'week': {
+      const d = new Date(e.timestamp);
+      if (isNaN(d.getTime())) return 'unknown';
+      const day = (d.getUTCDay() + 6) % 7; // Monday = 0
+      return new Date(d.getTime() - day * 86_400_000).toISOString().slice(0, 10);
+    }
+    case 'month':
+      return e.timestamp.slice(0, 7) || 'unknown';
     case 'model':
       return e.model ?? 'unknown';
     case 'source':

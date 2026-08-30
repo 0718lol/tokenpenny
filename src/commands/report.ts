@@ -4,7 +4,17 @@ import { enrichWithPRs } from '../core/prs.js';
 import { renderReport } from '../core/format.js';
 import { loadEvents } from '../sources/index.js';
 
-const GROUP_BY: GroupBy[] = ['project', 'day', 'model', 'session', 'source', 'branch', 'pr'];
+const GROUP_BY: GroupBy[] = [
+  'project',
+  'day',
+  'week',
+  'month',
+  'model',
+  'session',
+  'source',
+  'branch',
+  'pr',
+];
 
 export interface ReportOptions {
   since?: string;

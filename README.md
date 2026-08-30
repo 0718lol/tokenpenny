@@ -27,8 +27,9 @@ npx tokenpenny                              # last 30 days, grouped by project
 npx tokenpenny report --since 7d --by model # this week, per model
 npx tokenpenny report --by branch           # which branch burned the money
 npx tokenpenny report --by pr               # roll it up per pull request
+npx tokenpenny report --by week             # weekly rollups (month works too)
+npx tokenpenny blocks                       # 5-hour billing windows, active-block detection
 npx tokenpenny report --by branch -p api-server  # drill into one project
-npx tokenpenny report --since all --by day  # everything, per day
 npx tokenpenny sources                      # which agents were detected
 ```
 

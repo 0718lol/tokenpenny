@@ -33,6 +33,8 @@ export function table(headers: string[], rows: string[][], rightAlign: number[] 
 const HEADERS: Record<GroupBy, string[]> = {
   project: ['Project', 'Reqs', 'Input', 'Output', 'Cache R', 'Cache W', 'Cost'],
   day: ['Day', 'Reqs', 'Input', 'Output', 'Cache R', 'Cache W', 'Cost'],
+  week: ['Week (starts Mon)', 'Reqs', 'Input', 'Output', 'Cache R', 'Cache W', 'Cost'],
+  month: ['Month', 'Reqs', 'Input', 'Output', 'Cache R', 'Cache W', 'Cost'],
   model: ['Model', 'Reqs', 'Input', 'Output', 'Cache R', 'Cache W', 'Cost'],
   source: ['Source', 'Reqs', 'Input', 'Output', 'Cache R', 'Cache W', 'Cost'],
   session: ['Session', 'Reqs', 'Input', 'Output', 'Cache R', 'Cache W', 'Cost'],
