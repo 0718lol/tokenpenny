@@ -28,6 +28,16 @@ export interface AgentSource {
   collectEvents(): Promise<UsageEvent[]>;
 }
 
+export class SourceLoadError extends Error {
+  readonly failures: string[];
+
+  constructor(failures: string[]) {
+    super(`Unable to produce a complete usage report. ${failures.join('; ')}`);
+    this.name = 'SourceLoadError';
+    this.failures = failures;
+  }
+}
+
 export const SOURCES: AgentSource[] = [
   {
     id: 'claude-code',
@@ -97,7 +107,7 @@ export async function loadEvents(): Promise<UsageEvent[]> {
   }
 
   if (failures.length > 0) {
-    throw new Error(`Unable to produce a complete usage report. ${failures.join('; ')}`);
+    throw new SourceLoadError(failures);
   }
 
   const seen = new Set<string>();

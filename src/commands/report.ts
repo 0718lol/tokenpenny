@@ -1,8 +1,8 @@
-import type { GroupBy } from '../types.js';
+import type { GroupBy, UsageEvent } from '../types.js';
 import { aggregate, filterProject, parseSince } from '../core/aggregate.js';
 import { enrichWithPRs } from '../core/prs.js';
 import { renderReport } from '../core/format.js';
-import { loadEvents } from '../sources/index.js';
+import { loadEvents, SourceLoadError } from '../sources/index.js';
 
 const GROUP_BY: GroupBy[] = [
   'project',
@@ -31,7 +31,21 @@ export async function report(options: ReportOptions): Promise<void> {
     throw new Error(`Invalid --by value: "${by}" (choose from ${GROUP_BY.join(', ')})`);
   }
 
-  const all = await loadEvents();
+  let all: UsageEvent[];
+  try {
+    all = await loadEvents();
+  } catch (error) {
+    if (error instanceof SourceLoadError) {
+      if (options.json) {
+        console.log(JSON.stringify({ error: 'incomplete_data', failures: error.failures }, null, 2));
+      } else {
+        console.error(`Incomplete usage data: ${error.failures.join('; ')}`);
+      }
+      process.exitCode = 2;
+      return;
+    }
+    throw error;
+  }
   if (all.length === 0) {
     console.log('No usage events found. Detected no readable agent session logs.');
     return;
