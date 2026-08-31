@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { detectSources, loadEvents, SOURCES, SourceLoadError } from '../src/sources/index.js';
+import { detectSources, loadEvents, SOURCES, SourceLoadError, type AgentSource } from '../src/sources/index.js';
+import { inspectSources } from '../src/commands/doctor.js';
 import { parseLine as parseDshLine } from '../src/sources/dsh.js';
 import { collectEvents as collectGeminiEvents } from '../src/sources/gemini-cli.js';
 
@@ -116,4 +117,16 @@ test('parses Gemini CLI token summaries from recorded sessions', async () => {
     assert.equal(events.length, 1);
     assert.deepEqual(events[0], { source: 'gemini-cli', sessionId: 'gemini-session', messageId: 'gemini-1', projectPath: '/tmp/gemini-project', gitBranch: null, model: 'gemini-2.5-pro', timestamp: '2026-08-30T10:00:01.000Z', inputTokens: 120, outputTokens: 30, cacheReadTokens: 50, cacheWriteTokens: 0 });
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('doctor reports parsed event counts and source failures', async () => {
+  const event = { source: 'fixture', sessionId: 's', messageId: 'm', projectPath: '/tmp/p', gitBranch: null, model: 'model', timestamp: '2026-08-30T00:00:00Z', inputTokens: 1, outputTokens: 1, cacheReadTokens: 0, cacheWriteTokens: 0 };
+  const sources: AgentSource[] = [
+    { id: 'ok', name: 'OK', dataDir: () => '/ok', status: 'supported', isDetected: async () => true, collectEvents: async () => [event] },
+    { id: 'broken', name: 'Broken', dataDir: () => '/broken', status: 'supported', isDetected: async () => true, collectEvents: async () => { throw new Error('corrupt log'); } },
+  ];
+  const result = await inspectSources(sources);
+  assert.equal(result[0].events, 1);
+  assert.equal(result[0].error, undefined);
+  assert.equal(result[1].error, 'corrupt log');
 });

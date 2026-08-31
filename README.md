@@ -32,9 +32,10 @@ npx tokenpenny report --by week             # weekly rollups (month works too)
 npx tokenpenny report --by branch -p api-server  # drill into one project
 npx tokenpenny statusline                   # one-liner for Claude Code's status line
 npx tokenpenny sources                      # which agents were detected
+npx tokenpenny doctor                       # parser diagnostics and event counts
 ```
 
-Requires Node.js >= 20. Requires nothing else.
+Requires Node.js >= 22.5. Requires nothing else.
 
 **Claude Code status line** — add to `~/.claude/settings.json`:
 
@@ -123,6 +124,7 @@ Push it into `SOURCES` in `src/sources/index.ts`, add fixture lines + a test, op
 npm install
 npm test                        # type check + unit tests
 npm run dev -- report --since 7d --by model
+npx tokenpenny doctor           # verify detected sources and parser health
 ```
 
 ## 中文说明

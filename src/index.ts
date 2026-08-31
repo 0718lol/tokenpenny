@@ -5,6 +5,7 @@ import { report } from './commands/report.js';
 import { blocks } from './commands/blocks.js';
 import { watch } from './commands/watch.js';
 import { statusline } from './commands/statusline.js';
+import { doctor } from './commands/doctor.js';
 import { detectSources } from './sources/index.js';
 import { fmtInt, table } from './core/format.js';
 
@@ -58,7 +59,13 @@ program
     const rows = infos.map((s) => [s.name, s.id, s.detected ? 'yes' : 'not found', s.status, s.dataDir]);
     console.log(table(['Agent', 'Id', 'Detected', 'Status', 'Data dir'], rows));
     console.log('');
-    console.log(`Only agents marked supported are parsed. Detection-only sources need a parser before they can contribute usage.`);
+    console.log(`Use 'tokenpenny doctor' to parse detected sources and diagnose unreadable files.`);
   });
+
+program
+  .command('doctor')
+  .description('Check every detected source and report parser errors and event counts')
+  .option('--json', 'output JSON instead of a table')
+  .action((opts) => doctor(opts.json));
 
 program.parseAsync();
