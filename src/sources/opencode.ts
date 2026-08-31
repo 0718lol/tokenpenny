@@ -27,7 +27,7 @@ async function readDatabase(file: string): Promise<UsageEvent[]> {
   const { DatabaseSync } = await dynamicImport();
   const db = new DatabaseSync(file);
   try {
-    const rows = db.prepare(`SELECT m.id, m.time_created, m.data, s.directory
+    const rows = db.prepare(`SELECT m.id, m.session_id, m.time_created, m.data, s.directory
       FROM message m JOIN session s ON s.id = m.session_id`).all() as Array<Record<string, unknown>>;
     return rows.flatMap((row) => {
       const data = json(row.data);
@@ -42,7 +42,7 @@ async function readDatabase(file: string): Promise<UsageEvent[]> {
       if (input === null || output === null || input + output + cached + cacheWrite === 0) return [];
       const created = nonNegative(data.time && json(data.time)?.created) ?? nonNegative(row.time_created);
       if (created === null) return [];
-      return [{ source: 'opencode', sessionId: null, messageId: typeof row.id === 'string' ? row.id : null,
+      return [{ source: 'opencode', sessionId: typeof row.session_id === 'string' ? row.session_id : null, messageId: typeof row.id === 'string' ? row.id : null,
         projectPath: typeof data.path === 'object' && data.path !== null && typeof (data.path as any).cwd === 'string'
           ? (data.path as any).cwd : typeof row.directory === 'string' ? row.directory : null,
         gitBranch: null, model: typeof data.modelID === 'string' ? data.modelID : null,
