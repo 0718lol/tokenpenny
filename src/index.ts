@@ -55,10 +55,10 @@ program
   .description('List supported agents and whether their local data was found')
   .action(async () => {
     const infos = await detectSources();
-    const rows = infos.map((s) => [s.name, s.id, s.detected ? 'yes' : 'not found', s.dataDir]);
-    console.log(table(['Agent', 'Id', 'Detected', 'Data dir'], rows));
+    const rows = infos.map((s) => [s.name, s.id, s.detected ? 'yes' : 'not found', s.status, s.dataDir]);
+    console.log(table(['Agent', 'Id', 'Detected', 'Status', 'Data dir'], rows));
     console.log('');
-    console.log(`Parsed events will come from agents marked "yes". Total sources: ${fmtInt(infos.length)}`);
+    console.log(`Only agents marked supported are parsed. Detection-only sources need a parser before they can contribute usage.`);
   });
 
 program.parseAsync();

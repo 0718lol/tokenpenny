@@ -17,6 +17,19 @@ test('registers five supported agents', () => {
   );
 });
 
+test('labels detection-only sources so reports do not imply parser support', () => {
+  assert.deepEqual(
+    SOURCES.map((source) => [source.id, source.status]),
+    [
+      ['claude-code', 'supported'],
+      ['codex', 'supported'],
+      ['dsh', 'detection-only'],
+      ['opencode', 'detection-only'],
+      ['gemini-cli', 'detection-only'],
+    ],
+  );
+});
+
 test('detects nothing when HOME is empty', async () => {
   const empty = mkdtempSync(path.join(os.tmpdir(), 'tokenpenny-home-'));
   const prev = process.env.HOME;

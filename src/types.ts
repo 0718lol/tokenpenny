@@ -59,5 +59,6 @@ export interface SourceInfo {
   name: string;
   dataDir: string;
   detected: boolean;
+  status: 'supported' | 'detection-only';
   eventCount?: number;
 }

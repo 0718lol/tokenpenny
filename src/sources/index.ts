@@ -24,6 +24,7 @@ export interface AgentSource {
   name: string;
   dataDir(): string;
   isDetected(): Promise<boolean>;
+  status: SourceInfo['status'];
   collectEvents(): Promise<UsageEvent[]>;
 }
 
@@ -32,6 +33,7 @@ export const SOURCES: AgentSource[] = [
     id: 'claude-code',
     name: 'Claude Code',
     dataDir: claudeCode.defaultDataDir,
+    status: 'supported',
     isDetected: () => pathExists(claudeCode.defaultDataDir()),
     collectEvents: () => claudeCode.collectEvents(),
   },
@@ -39,6 +41,7 @@ export const SOURCES: AgentSource[] = [
     id: 'codex',
     name: 'Codex (OpenAI)',
     dataDir: codex.defaultDataDir,
+    status: 'supported',
     isDetected: () => codex.isDetected(),
     collectEvents: () => codex.collectEvents(),
   },
@@ -46,6 +49,7 @@ export const SOURCES: AgentSource[] = [
     id: 'dsh',
     name: 'DeepSeek Harness',
     dataDir: dsh.defaultDataDir,
+    status: 'detection-only',
     isDetected: () => dsh.isDetected(),
     collectEvents: () => dsh.collectEvents(),
   },
@@ -53,6 +57,7 @@ export const SOURCES: AgentSource[] = [
     id: 'opencode',
     name: 'OpenCode',
     dataDir: opencode.defaultDataDir,
+    status: 'detection-only',
     isDetected: () => opencode.isDetected(),
     collectEvents: () => opencode.collectEvents(),
   },
@@ -60,6 +65,7 @@ export const SOURCES: AgentSource[] = [
     id: 'gemini-cli',
     name: 'Gemini CLI',
     dataDir: geminiCli.defaultDataDir,
+    status: 'detection-only',
     isDetected: () => geminiCli.isDetected(),
     collectEvents: () => geminiCli.collectEvents(),
   },
@@ -72,6 +78,7 @@ export async function detectSources(): Promise<SourceInfo[]> {
       name: s.name,
       dataDir: s.dataDir(),
       detected: await s.isDetected(),
+      status: s.status,
     })),
   );
 }
@@ -79,13 +86,18 @@ export async function detectSources(): Promise<SourceInfo[]> {
 /** Collect events from all detected sources, deduped by provider message id. */
 export async function loadEvents(): Promise<UsageEvent[]> {
   const all: UsageEvent[] = [];
+  const failures: string[] = [];
   for (const source of SOURCES) {
     if (!(await source.isDetected())) continue;
     try {
       all.push(...(await source.collectEvents()));
     } catch (err) {
-      console.error(`! failed to read ${source.id}: ${(err as Error).message}`);
+      failures.push(`${source.id}: ${(err as Error).message}`);
     }
+  }
+
+  if (failures.length > 0) {
+    throw new Error(`Unable to produce a complete usage report. ${failures.join('; ')}`);
   }
 
   const seen = new Set<string>();
