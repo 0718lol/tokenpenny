@@ -1,9 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { detectSources, loadEvents, SOURCES, SourceLoadError } from '../src/sources/index.js';
+import { parseLine as parseDshLine } from '../src/sources/dsh.js';
+import { collectEvents as collectGeminiEvents } from '../src/sources/gemini-cli.js';
 
 /**
  * Detection reads os.homedir(), which follows $HOME on POSIX — point it at a
@@ -17,15 +19,15 @@ test('registers five supported agents', () => {
   );
 });
 
-test('labels detection-only sources so reports do not imply parser support', () => {
+test('labels all sources with a verified parser', () => {
   assert.deepEqual(
     SOURCES.map((source) => [source.id, source.status]),
     [
       ['claude-code', 'supported'],
       ['codex', 'supported'],
-      ['dsh', 'detection-only'],
-      ['opencode', 'detection-only'],
-      ['gemini-cli', 'detection-only'],
+      ['dsh', 'supported'],
+      ['opencode', 'supported'],
+      ['gemini-cli', 'supported'],
     ],
   );
 });
@@ -82,4 +84,36 @@ test('detects each agent by its data dir', async () => {
     process.env.HOME = prev;
     rmSync(home, { recursive: true, force: true });
   }
+});
+
+test('parses DSH assistant usage from the durable event envelope', () => {
+  const event = parseDshLine(JSON.stringify({
+    type: 'assistant/message',
+    time: 1_756_000_000_000,
+    data: {
+      message: { id: 'dsh-msg', source: { model: 'deepseek-chat' }, path: { cwd: '/tmp/project' } },
+      usage: { inputTokens: 100, outputTokens: 40, cacheReadTokens: 20, cacheWriteTokens: 5 },
+    },
+  }), 'session-1');
+  assert.deepEqual(event && {
+    source: event.source, sessionId: event.sessionId, messageId: event.messageId,
+    projectPath: event.projectPath, model: event.model, inputTokens: event.inputTokens,
+    outputTokens: event.outputTokens, cacheReadTokens: event.cacheReadTokens, cacheWriteTokens: event.cacheWriteTokens,
+  }, { source: 'dsh', sessionId: 'session-1', messageId: 'dsh-msg', projectPath: '/tmp/project', model: 'deepseek-chat', inputTokens: 100, outputTokens: 40, cacheReadTokens: 20, cacheWriteTokens: 5 });
+});
+
+test('parses Gemini CLI token summaries from recorded sessions', async () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'tokenpenny-gemini-'));
+  try {
+    mkdirSync(path.join(root, 'project'), { recursive: true });
+    writeFileSync(path.join(root, 'project', 'session-test.jsonl'), JSON.stringify({
+      sessionId: 'gemini-session', directories: ['/tmp/gemini-project'], messages: [
+        { id: 'user-1', type: 'user', timestamp: '2026-08-30T10:00:00.000Z', content: [{ text: 'hi' }] },
+        { id: 'gemini-1', type: 'gemini', timestamp: '2026-08-30T10:00:01.000Z', model: 'gemini-2.5-pro', tokens: { input: 120, output: 30, cached: 50, total: 200 } },
+      ],
+    }) + '\n');
+    const events = await collectGeminiEvents(root);
+    assert.equal(events.length, 1);
+    assert.deepEqual(events[0], { source: 'gemini-cli', sessionId: 'gemini-session', messageId: 'gemini-1', projectPath: '/tmp/gemini-project', gitBranch: null, model: 'gemini-2.5-pro', timestamp: '2026-08-30T10:00:01.000Z', inputTokens: 120, outputTokens: 30, cacheReadTokens: 50, cacheWriteTokens: 0 });
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });

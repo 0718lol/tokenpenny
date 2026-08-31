@@ -71,9 +71,9 @@ Note the last line: models tokenpenny has no verified price for are **flagged, n
 |---|---|
 | Claude Code | ✅ shipped |
 | Codex (OpenAI) | ✅ shipped |
-| DeepSeek Harness (DSH) | 🔜 detection shipped — parser needs the official 4-layer zstd codec, see `src/sources/dsh.ts` |
-| OpenCode | 🔜 detection shipped — parser needs its SQLite schema, see `src/sources/opencode.ts` |
-| Gemini CLI | 🔜 detection shipped — parser needs a verified session format, see `src/sources/gemini-cli.ts` |
+| DeepSeek Harness (DSH) | ✅ shipped — parses durable JSONL usage events, including zstd artifacts when `zstd` is installed |
+| OpenCode | ✅ shipped — reads assistant token accounting from the local SQLite store (Node.js >= 22.5) |
+| Gemini CLI | ✅ shipped — parses recorded session token summaries |
 
 ## Roadmap — three pillars
 
