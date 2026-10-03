@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   pull_request:
+    paths-ignore:
+      # data-only PRs (the monthly pricing refresh) are validated inside
+      # update-prices.yml; a pull_request run here would just sit in
+      # action_required because the PR author is github-actions[bot]
+      - 'data/**'
 
 jobs:
   test:

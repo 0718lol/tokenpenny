@@ -18,6 +18,8 @@ jobs:
         with:
           node-version: 22
       - run: node scripts/update-prices.mjs
+      - run: npm ci
+      - run: npm test
       - uses: peter-evans/create-pull-request@v7
         with:
           commit-message: 'chore: refresh LiteLLM pricing snapshot'
@@ -25,6 +27,8 @@ jobs:
           body: |
             Automated monthly refresh of `data/model-prices.json` from
             [LiteLLM's pricing database](https://github.com/BerriAI/litellm).
-            If CI is green, merging keeps model pricing current for everyone.
+            The full test suite runs in this workflow against the refreshed
+            snapshot before this PR is created — safe to merge when this
+            workflow is green.
           branch: chore/pricing-refresh
           delete-branch: true
